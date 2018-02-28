@@ -19,13 +19,22 @@
   </head>
   <body>
      <button id = "register1" type="button" onclick="App.registerUser()" >Register User</button> 
-     <table style = "width:1000px;">
+     <table style = "width:800px;">
         <th><div id = "user1" width = "50%">User1</div></th>
         <th><div id = "user2" width = "50%">User2</div></th>
      </table>
-     <button id = "getUser1" type="button" onclick="App.getUser(1)">Get User1</button> 
-     <button id = "getUser1" type="button" onclick="App.getUser(2)">Get User2</button> 
+     <button id = "getUser1" style = "width:400px;" type="button" onclick="App.getUser(1)">Get User1</button> 
+     <button id = "getUser2" style = "width:400px;" type="button" onclick="App.getUser(2)">Get User2</button> <br>
+     
+     <input type="text" style = "width:400px;" name="choice" value="choice">
+     <input type="text" style = "width:400px;" name="str" value="str"><br>
+     <button id = "lock" type="button" onclick="">Lock Choice</button> <br>
 
+      <table style = "width:800px;">
+        <th><div  width = "50%">Game State</div></th>
+        <th><div id = "state" width = "50%">[Unknown]</div></th>
+     </table>
+     <button id = "reset" type="button" onclick="App.resetContract()">Reset</button> 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->

@@ -30,7 +30,7 @@ App = {
       App.contracts.RPS.setProvider(App.web3Provider);
 
       // Use our contract to retrieve and mark the adopted pets
-      return App.resetContract();
+      //return App.resetContract();
     });
 
     return App.bindEvents();
@@ -38,13 +38,20 @@ App = {
 
   resetContract: function(){
     var rpsInstance;
-    App.contracts.RPS.deployed().then(function(instance) {
-      rpsInstance = instance;
-      return rpsInstance.cleanup.call();
-    }).then(function(){
-      console.log("Successfully reset the contract to begin state");
-    }).catch(function(err) {
-      console.log(err.message);
+    // Cleanup requires spending some transaction, because it writes a value
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+      var account = accounts[0];
+      App.contracts.RPS.deployed().then(function(instance) {
+        rpsInstance = instance;
+        return rpsInstance.cleanup({from: account});
+      }).then(function(){
+        console.log("Successfully reset the contract to begin state");
+      }).catch(function(err) {
+        console.log(err.message);
+      });
     });
   },
 
@@ -54,20 +61,21 @@ App = {
 
   getUser : function(id){
     var rpsInstance;
-    App.contracts.RPS.deployed().then(function(instance) {
-      rpsInstance = instance;
-      if(id==1)
-        return rpsInstance.getUser1.call();
-      else
-        return rpsInstance.getUser2.call();
-    }).then(function(address){
-      if(id==1)
-        document.getElementById("user1").innerHTML = address;
-      else
-        document.getElementById("user2").innerHTML = address;
-    }).catch(function(err) {
-      console.log(err.message);
-    });
+    
+      App.contracts.RPS.deployed().then(function(instance) {
+        rpsInstance = instance;
+        if(id==1)
+          return rpsInstance.getUser1.call();
+        else 
+          return rpsInstance.getUser2.call();
+      }).then(function(address){
+        if(id==1)
+          document.getElementById("user1").innerHTML = address;
+        else
+          document.getElementById("user2").innerHTML = address;
+      }).catch(function(err) {
+        console.log(err.message);
+      });
   },
 
   registerUser : function(){
@@ -87,6 +95,26 @@ App = {
         console.log(err.message);
       });
     });
+  },
+
+  getGameState : function(){
+    var rpsInstance;
+    App.contracts.RPS.deployed().then(function(instance) {
+      rpsInstance = instance;
+      return rpsInstance.getState.call();
+    }).then(function(state){
+      console.log("Found state = "+state);  
+      if(state==0)
+          document.getElementById("state").innerHTML = "Nobody Locked";
+      if(state==1)
+          document.getElementById("state").innerHTML = "User2 locked";
+      if(state==2)
+          document.getElementById("state").innerHTML = "User1 locked";
+      if(state==3)
+          document.getElementById("state").innerHTML = "Both users locked";
+    }).catch(function(err) {
+      console.log(err.message);
+    });
   }
 
 };
@@ -94,5 +122,9 @@ App = {
 $(function() {
   $(window).load(function() {
     App.init();
+     setInterval(function(){ 
+        App.getGameState()
+      }, 10000);
   });
+
 });

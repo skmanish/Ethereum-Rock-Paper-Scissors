@@ -20,6 +20,11 @@ contract RPS {
 		require(msg.sender==user1 || msg.sender==user2);
 		_;
 	}
+	// Check if user is already registered
+	modifier isNotRegistered() {
+		require(msg.sender!=user1 && msg.sender!=user2);
+		_;
+	}
 	// Check if both users have locked their choices, so the game can go to reveal stage
 	modifier bothLocked(){
 		require( hash1!=0 && hash2!=0);
@@ -33,19 +38,22 @@ contract RPS {
 
 	// Initializes all the variables to default values
 	function cleanup() public {
-	  user1 = 0;
-	  user2 = 0;
+	  user1 = address(0);
+	  user2 = address(0);
 	  hash1 = "";
 	  hash2 = "";
 	  claimed1 = 0;
 	  claimed2 = 0;
 	  startTimeForClaim = 0;
 	}
-	function register() public {
-		if(user1==0)
+	function register() public isNotRegistered {
+		if(user1==0){
 			user1 = msg.sender;
-		else if(user2==0)
-			user2 = msg.sender;
+		}
+		else {
+			if(user2==0)
+				user2 = msg.sender;
+		}
 	}
 	function lock(string choice,string randStr) public isRegistered validChoice(choice) {
 		if(msg.sender ==user1 && hash1==0)
@@ -89,5 +97,14 @@ contract RPS {
 	}
 	function getHash2() public view returns (bytes32) {
 	  	return hash2;
+	}
+	function getState() public view returns (int) {
+	  	if(hash1==bytes32(0) && hash2==bytes32(0))
+	  		return 0;
+	  	if(hash1==bytes32(0) && hash2!=bytes32(0))
+	  		return 1;
+	  	if(hash1!=bytes32(0) && hash2==bytes32(0))
+	  		return 2;
+	  	return 3;
 	}
 }
