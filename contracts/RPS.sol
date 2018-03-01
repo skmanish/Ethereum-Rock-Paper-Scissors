@@ -40,8 +40,8 @@ contract RPS {
 	function cleanup() public {
 	  user1 = address(0);
 	  user2 = address(0);
-	  hash1 = "";
-	  hash2 = "";
+	  hash1 = bytes32(0);
+	  hash2 = bytes32(0);
 	  claimed1 = 0;
 	  claimed2 = 0;
 	  startTimeForClaim = 0;
@@ -55,35 +55,52 @@ contract RPS {
 				user2 = msg.sender;
 		}
 	}
-	function lock(string choice,string randStr) public isRegistered validChoice(choice) {
-		if(msg.sender ==user1 && hash1==0)
+	function lock(string choice,string randStr) public isRegistered validChoice(choice) returns (bool) {
+		if(msg.sender ==user1 && hash1==bytes32(0)){
 			hash1 = keccak256(keccak256(choice) ^ keccak256(randStr));
-		if(msg.sender ==user2 && hash2==0)
+			return true;
+		}
+		if(msg.sender ==user2 && hash2==bytes32(0)){
 			hash2 = keccak256(keccak256(choice) ^ keccak256(randStr));
+			return true;
+		}
+		return false;
 	}
-	function open(string choice,string randStr) public isRegistered bothLocked validChoice(choice) {
+	function open(string choice,string randStr) public isRegistered bothLocked validChoice(choice) returns (bool) {
 		bytes32 tempHash = keccak256(keccak256(choice) ^ keccak256(randStr));
 		if(msg.sender ==user1){
 			if(tempHash==hash1){
-				if(keccak256(choice)==keccak256("rock"))
-					claimed1 = 0;
-				if(keccak256(choice)==keccak256("paper"))
+				if(keccak256(choice)==keccak256("rock")){
 					claimed1 = 1;
-				if(keccak256(choice)==keccak256("scissors"))
+					return true;
+				}
+				if(keccak256(choice)==keccak256("paper")){
 					claimed1 = 2;
+					return true;
+				}
+				if(keccak256(choice)==keccak256("scissors")){
+					claimed1 = 3;
+					return true;
+				}
 			}
 		}
 		if(msg.sender ==user2){
-			hash2 = keccak256(keccak256(choice) ^ keccak256(randStr));
-			if(tempHash==hash1){
-				if(keccak256(choice)==keccak256("rock"))
-					claimed1 = 0;
-				if(keccak256(choice)==keccak256("paper"))
-					claimed1 = 1;
-				if(keccak256(choice)==keccak256("scissors"))
-					claimed1 = 2;
+			if(tempHash==hash2){
+				if(keccak256(choice)==keccak256("rock")){
+					claimed2 = 1;
+					return true;
+				}
+				if(keccak256(choice)==keccak256("paper")){
+					claimed2 = 2;
+					return true;
+				}
+				if(keccak256(choice)==keccak256("scissors")){
+					claimed2 = 3;
+					return true;
+				}
 			}
 		}
+		return false;
 	}
 	// Functions for logs
 	function getUser1() public view returns (address) {
@@ -105,6 +122,7 @@ contract RPS {
 	  		return 1;
 	  	if(hash1!=bytes32(0) && hash2==bytes32(0))
 	  		return 2;
-	  	return 3;
+	  	// Both users have locked at this point of time, return values if claimed
+	  	return 4 + (claimed1*10 + claimed2);
 	}
 }

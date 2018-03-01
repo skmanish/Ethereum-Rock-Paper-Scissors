@@ -110,21 +110,78 @@ App = {
           document.getElementById("state").innerHTML = "User2 locked";
       if(state==2)
           document.getElementById("state").innerHTML = "User1 locked";
-      if(state==3)
+      if(state>=3){
           document.getElementById("state").innerHTML = "Both users locked";
+          var choices=["","rock","paper","scissors"];
+          var claimed1 = Math.floor((state-4)/10);
+          var claimed2 = Math.floor((state-4)%10);
+          if(claimed1!=0)
+            document.getElementById("state").innerHTML += " User 1 claimed "+choices[claimed1];
+          if(claimed2!=0)
+            document.getElementById("state").innerHTML += " User 2 claimed "+choices[claimed2];
+        }
     }).catch(function(err) {
       console.log(err.message);
     });
+  },
+
+  lockUserChoice: function(){
+    var rpsInstance;
+    choice = document.getElementById("c1").value;
+    str = document.getElementById("c2").value;
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+      var account = accounts[0];
+      console.log(account)
+      App.contracts.RPS.deployed().then(function(instance) {
+        rpsInstance = instance;
+        return rpsInstance.lock(choice, str, {from: account})
+      }).then(function(result){
+        if(result==0)
+          console.log("Could not lock choice");
+        else  
+          console.log("Successfully Locked User, result = "+result);
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
+  },
+  unlockUserChoice: function(){
+    var rpsInstance;
+    choice = document.getElementById("o1").value;
+    str = document.getElementById("o2").value;
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+      var account = accounts[0];
+      console.log(account)
+      App.contracts.RPS.deployed().then(function(instance) {
+        rpsInstance = instance;
+        return rpsInstance.open(choice, str, {from: account})
+      }).then(function(result){
+        globalResult = result;
+        if(result==0)
+          console.log("Could not unlock with given (choice,string)");
+        else
+          console.log("Successfully Claimed User, result = "+result);
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
   }
-
 };
-
+var globalResult = "";
 $(function() {
   $(window).load(function() {
     App.init();
      setInterval(function(){ 
         App.getGameState()
-      }, 10000);
+        App.getUser(1);
+        App.getUser(2);
+      }, 5000);
   });
 
 });

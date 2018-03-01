@@ -26,9 +26,13 @@
      <button id = "getUser1" style = "width:400px;" type="button" onclick="App.getUser(1)">Get User1</button> 
      <button id = "getUser2" style = "width:400px;" type="button" onclick="App.getUser(2)">Get User2</button> <br>
      
-     <input type="text" style = "width:400px;" name="choice" value="choice">
-     <input type="text" style = "width:400px;" name="str" value="str"><br>
-     <button id = "lock" type="button" onclick="">Lock Choice</button> <br>
+     <input id = "c1" type="text" style = "width:400px;" name="choice" value="choice">
+     <input id = "c2" type="text" style = "width:400px;" name="str" value="str"><br>
+     <button id = "lock" type="button" onclick="App.lockUserChoice()">Lock Choice</button> <br>
+
+     <input id = "o1" type="text" style = "width:400px;" name="choice" value="choice">
+     <input id = "o2" type="text" style = "width:400px;" name="str" value="str"><br>
+     <button id = "unlock" type="button" onclick="App.unlockUserChoice()">Unlock Choice</button> <br>
 
       <table style = "width:800px;">
         <th><div  width = "50%">Game State</div></th>
