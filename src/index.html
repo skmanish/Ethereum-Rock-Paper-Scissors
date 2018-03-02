@@ -9,6 +9,7 @@
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -18,27 +19,57 @@
     <![endif]-->
   </head>
   <body>
-     <button id = "register1" type="button" onclick="App.registerUser()" >Register User</button> 
-     <table style = "width:800px;">
-        <th><div id = "user1" width = "50%">User1</div></th>
-        <th><div id = "user2" width = "50%">User2</div></th>
-     </table>
-     <button id = "getUser1" style = "width:400px;" type="button" onclick="App.getUser(1)">Get User1</button> 
-     <button id = "getUser2" style = "width:400px;" type="button" onclick="App.getUser(2)">Get User2</button> <br>
+    <div align="middle" style = "height: 100vh; width: 100%;background-image: url(../images/bg.jpg); padding:30px;">
+      <div align="middle" style="width:100%"><font size="7" color="white">ROCK PAPER SCISSORS</font></div>
+       <table style = "width:100%;padding:40px;">
+          <tr>
+            <th><div align="middle"><img src="../images/face.png" style = "width: 50%;height: 300px;"></div></th>
+            <th><div align="middle"><img src="../images/face.png" style = "width: 50%;height: 300px;"></div></th>
+          </tr>
+          <tr>
+            <th height="50">
+              <div align="middle" >
+                  <font id = "user1" size="4" color="white" style = "width: 50%;">User1</font>
+              </div>
+            </th>
+            <th height="50">
+              <div align="middle" >
+                  <font id = "user2" size="4" color="white" style = "width: 50%;">User2</font>
+              </div>
+            </th>
+          </tr>
+       </table> 
+       <!-- Section to register for game -->
+      <div id="section1" align = "middle" height="40vh" style="display:none;">
+        <button class="button" type="button" onclick="App.registerUser()" >Enter Here</button> <br>
+      </div>
+
+      <!-- Section to lock a choice -->
+      <div id="section2" align = "middle" height="40vh" style="display:none;">
+         <select id="choice" name="choice">
+            <option value="rock">Rock</option>
+            <option value="paper">Paper</option>
+            <option value="scissors">Scissors</option>
+          </select>
+         <input id = "c2" type="text" style = "width:400px;" name="str" value="str">
+         <button class="button" id = "lock" type="button" onclick="App.lockUserChoice()">Lock Choice</button> <br>
+       </div>
+
+       <!-- Section to unlock a choice -->
+       <div id="section3" align = "middle" height="40vh" style="display:block;">
+         <select id="choice2" name="choice2">
+            <option value="rock">Rock</option>
+            <option value="paper">Paper</option>
+            <option value="scissors">Scissors</option>
+          </select>
+         <input id = "o2" type="text" style = "width:400px;" name="str" value="str">
+         <button class="button" id = "unlock" type="button" onclick="App.unlockUserChoice()">Unlock Choice</button> <br>
+       </div>
+
+        <div align="middle" style="width:100%"><font id="state" size="4" color="white">[Loading Game State..]</font></div>
+       
+    </div>
      
-     <input id = "c1" type="text" style = "width:400px;" name="choice" value="choice">
-     <input id = "c2" type="text" style = "width:400px;" name="str" value="str"><br>
-     <button id = "lock" type="button" onclick="App.lockUserChoice()">Lock Choice</button> <br>
-
-     <input id = "o1" type="text" style = "width:400px;" name="choice" value="choice">
-     <input id = "o2" type="text" style = "width:400px;" name="str" value="str"><br>
-     <button id = "unlock" type="button" onclick="App.unlockUserChoice()">Unlock Choice</button> <br>
-
-      <table style = "width:800px;">
-        <th><div  width = "50%">Game State</div></th>
-        <th><div id = "state" width = "50%">[Unknown]</div></th>
-     </table>
-     <button id = "reset" type="button" onclick="App.resetContract()">Reset</button> 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->

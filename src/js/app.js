@@ -1,7 +1,7 @@
 App = {
   web3Provider: null,
   contracts: {},
-
+  registered: false,
   init: function() {
 
     return App.initWeb3();
@@ -97,7 +97,7 @@ App = {
     });
   },
 
-  getGameState : function(){
+  getGameState : function(callback){
     var rpsInstance;
     App.contracts.RPS.deployed().then(function(instance) {
       rpsInstance = instance;
@@ -120,6 +120,8 @@ App = {
           if(claimed2!=0)
             document.getElementById("state").innerHTML += " User 2 claimed "+choices[claimed2];
         }
+        if(callback)
+          callback(state);
     }).catch(function(err) {
       console.log(err.message);
     });
@@ -127,7 +129,8 @@ App = {
 
   lockUserChoice: function(){
     var rpsInstance;
-    choice = document.getElementById("c1").value;
+    var e = document.getElementById("choice");
+    var choice = e.options[e.selectedIndex].value;
     str = document.getElementById("c2").value;
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
@@ -150,14 +153,15 @@ App = {
   },
   unlockUserChoice: function(){
     var rpsInstance;
-    choice = document.getElementById("o1").value;
+    var e = document.getElementById("choice2");
+    var choice = e.options[e.selectedIndex].value;
     str = document.getElementById("o2").value;
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
         console.log(error);
       }
       var account = accounts[0];
-      console.log(account)
+      console.log(account);
       App.contracts.RPS.deployed().then(function(instance) {
         rpsInstance = instance;
         return rpsInstance.open(choice, str, {from: account})
@@ -171,17 +175,71 @@ App = {
         console.log(err.message);
       });
     });
+  },
+  amIRegistered: function(callback){
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+      var account = accounts[0];
+      if(document.getElementById("user1").innerHTML==account)
+        registered = 1;
+      else if(document.getElementById("user2").innerHTML==account)
+        registered = 2;
+      else registered = 0;
+      console.log("In function amIRegistered = "+registered);
+      callback(registered);
+    });
   }
 };
+function updateUserState(){
+  App.amIRegistered(function(registered){
+    App.getGameState(function(state){
+      console.log("Registered = "+registered);
+      console.log("Game state = "+state);
+
+      // Switch on/off section 1
+      if(document.getElementById("section1").style.display=="none")
+        if(!registered)
+          document.getElementById("section1").style.display="block";
+      if(document.getElementById("section1").style.display=="block")
+        if(registered)
+          document.getElementById("section1").style.display="none";
+
+      // Switch on/off section 2
+      if(document.getElementById("section2").style.display=="none")
+        if(registered && state<=3)
+          document.getElementById("section2").style.display="block";
+      if(document.getElementById("section2").style.display=="block")
+        if(!registered || state>=3)
+          document.getElementById("section2").style.display="none";
+
+      // Switch on/off section 3
+      if(document.getElementById("section3").style.display=="none")
+        if(registered && state>=3)
+          document.getElementById("section3").style.display="block";
+      if(document.getElementById("section3").style.display=="block")
+        if(!registered || state<=3)
+          document.getElementById("section3").style.display="none";
+    })
+  });
+}
+
 var globalResult = "";
 $(function() {
   $(window).load(function() {
     App.init();
-     setInterval(function(){ 
-        App.getGameState()
+    setTimeout(function(){
+    App.getGameState();
         App.getUser(1);
         App.getUser(2);
-      }, 5000);
+        }, 2000);
+     setInterval(function(){ 
+        // App.getGameState();
+        // App.getUser(1);
+        // App.getUser(2);
+        updateUserState();
+      }, 3000);
   });
 
 });
