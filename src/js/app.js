@@ -88,7 +88,7 @@ App = {
       console.log(account)
       App.contracts.RPS.deployed().then(function(instance) {
         rpsInstance = instance;
-        return rpsInstance.register({from: account})
+        return rpsInstance.register({from: account, value:web3.toWei(5, "ether")})
       }).then(function(){
         console.log("Successfully Registered User1");
       }).catch(function(err) {
@@ -103,7 +103,6 @@ App = {
       rpsInstance = instance;
       return rpsInstance.getState.call();
     }).then(function(state){
-      console.log("Found state = "+state);  
       if(state==0)
           document.getElementById("state").innerHTML = "Nobody Locked";
       if(state==1)
@@ -113,8 +112,8 @@ App = {
       if(state>=3){
           document.getElementById("state").innerHTML = "Both users locked";
           var choices=["","rock","paper","scissors"];
-          var claimed1 = Math.floor((state-4)/10);
-          var claimed2 = Math.floor((state-4)%10);
+          var claimed1 = state%10;
+          var claimed2 = Math.floor(state/10)%10;
           if(claimed1!=0)
             document.getElementById("state").innerHTML += " User 1 claimed "+choices[claimed1];
           if(claimed2!=0)
@@ -187,16 +186,54 @@ App = {
       else if(document.getElementById("user2").innerHTML==account)
         registered = 2;
       else registered = 0;
-      console.log("In function amIRegistered = "+registered);
       callback(registered);
+    });
+  },
+  // getContractBalance: function(callback){
+  //   var rpsInstance;
+  //   App.contracts.RPS.deployed().then(function(instance) {
+  //     rpsInstance = instance;
+  //     return rpsInstance.getContractBalance.call();
+  //   }).then(function(result){
+  //     console.log("Get contract balance result = "+result);
+  //   }).catch(function(err) {
+  //     console.log(err.message);
+  //   });
+  // },
+  // getContractAddress: function(callback){
+  //   var rpsInstance;
+  //   App.contracts.RPS.deployed().then(function(instance) {
+  //     rpsInstance = instance;
+  //     return rpsInstance.getContractAddress.call();
+  //   }).then(function(result){
+  //     console.log("Get contract address result = "+result);
+  //   }).catch(function(err) {
+  //     console.log(err.message);
+  //   });
+  // },
+  collectRewards: function(callback){
+    var rpsInstance;
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+      var account = accounts[0];
+      App.contracts.RPS.deployed().then(function(instance) {
+        rpsInstance = instance;
+        return rpsInstance.processRewards({from: account, gasLimit: "100000"});
+      }).then(function(result){
+        console.log("Successfully collectRewards");
+      }).catch(function(err) {
+        console.log(err.message);
+      });
     });
   }
 };
 function updateUserState(){
   App.amIRegistered(function(registered){
     App.getGameState(function(state){
-      console.log("Registered = "+registered);
-      console.log("Game state = "+state);
+      state = parseInt(state)
+      console.log("Registered = "+registered + " Game state = "+state);
 
       // Switch on/off section 1
       if(document.getElementById("section1").style.display=="none")
@@ -216,11 +253,19 @@ function updateUserState(){
 
       // Switch on/off section 3
       if(document.getElementById("section3").style.display=="none")
-        if(registered && state>=3)
+        if(registered && state>=3 && (state%10==0 || Math.floor(state/10)%10==0))
           document.getElementById("section3").style.display="block";
       if(document.getElementById("section3").style.display=="block")
-        if(!registered || state<=3)
+        if(!registered || state<=3 || (state%10!=0 && Math.floor(state/10)%10!=0))
           document.getElementById("section3").style.display="none";
+
+      // Switch on/off section 4
+      if(document.getElementById("section4").style.display=="none")
+        if(state>=3 && state%10!=0 && Math.floor(state/10)%10!=0)
+          document.getElementById("section4").style.display="block";
+      if(document.getElementById("section4").style.display=="block")
+        if(state<3 || state%10==0 || Math.floor(state/10)%10==0)
+          document.getElementById("section4").style.display="none";
     })
   });
 }
@@ -229,17 +274,14 @@ var globalResult = "";
 $(function() {
   $(window).load(function() {
     App.init();
-    setTimeout(function(){
-    App.getGameState();
-        App.getUser(1);
-        App.getUser(2);
-        }, 2000);
      setInterval(function(){ 
         // App.getGameState();
         // App.getUser(1);
         // App.getUser(2);
         updateUserState();
-      }, 3000);
+        App.getUser(1);
+        App.getUser(2);
+      }, 2000);
   });
 
 });

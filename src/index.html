@@ -40,12 +40,12 @@
           </tr>
        </table> 
        <!-- Section to register for game -->
-      <div id="section1" align = "middle" height="40vh" style="display:none;">
+      <div id="section1" align = "middle" height="40vh" style="display:none;padding: 40px;">
         <button class="button" type="button" onclick="App.registerUser()" >Enter Here</button> <br>
       </div>
 
       <!-- Section to lock a choice -->
-      <div id="section2" align = "middle" height="40vh" style="display:none;">
+      <div id="section2" align = "middle" height="40vh" style="display:none;padding: 40px;">
          <select id="choice" name="choice">
             <option value="rock">Rock</option>
             <option value="paper">Paper</option>
@@ -56,7 +56,7 @@
        </div>
 
        <!-- Section to unlock a choice -->
-       <div id="section3" align = "middle" height="40vh" style="display:block;">
+       <div id="section3" align = "middle" height="40vh" style="display:none;padding: 40px;">
          <select id="choice2" name="choice2">
             <option value="rock">Rock</option>
             <option value="paper">Paper</option>
@@ -65,6 +65,11 @@
          <input id = "o2" type="text" style = "width:400px;" name="str" value="str">
          <button class="button" id = "unlock" type="button" onclick="App.unlockUserChoice()">Unlock Choice</button> <br>
        </div>
+
+       <!-- Section to process rewards -->
+       <div id="section4" align = "middle" height="40vh" style="display:none;padding: 40px;">
+        <button class="button" type="button" onclick="App.collectRewards()" >Process Rewards</button> <br>
+      </div>
 
         <div align="middle" style="width:100%"><font id="state" size="4" color="white">[Loading Game State..]</font></div>
        
