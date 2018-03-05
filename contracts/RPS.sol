@@ -32,7 +32,7 @@ contract RPS {
 	}
 	// Check if both users have locked their choices, so the game can go to reveal stage
 	modifier bothClaimed(){
-		require(claimed1!=0 && claimed2!=0);
+		require((claimed1!=0 && claimed2!=0) || (now-firstRevealTime)>=120);
 		_;
 	}
 	// Check if string is valid
@@ -130,14 +130,14 @@ contract RPS {
 			user2.transfer(4990000000000000000);
 		}
 		// 3 choices in which user 1 wins
-		if((claimed1==1 && claimed2==3) || (claimed1==2 && claimed2==1) || (claimed1==3 && claimed2==2) || claimed2==-1)
+		if((claimed1==1 && claimed2==3) || (claimed1==2 && claimed2==1) || (claimed1==3 && claimed2==2) || claimed2==0)
 			user1.transfer(9980000000000000000);
 		// 3 choices in which user 1 wins
-		if((claimed1==3 && claimed2==1) || (claimed1==1 && claimed2==2) || (claimed1==2 && claimed2==3) || claimed1==-1)
+		if((claimed1==3 && claimed2==1) || (claimed1==1 && claimed2==2) || (claimed1==2 && claimed2==3) || claimed1==0)
 			user2.transfer(9980000000000000000);
 		// Reset all variables
-		user1 = address(0);
-		user2 = address(0);
+		user1 = 0;
+		user2 = 0;
 		hash1 = bytes32(0);
 		hash2 = bytes32(0);
 		claimed1 = 0;
@@ -165,6 +165,9 @@ contract RPS {
 	}
 	function getHash2() public view returns (bytes32) {
 	  	return hash2;
+	}
+	function getTimeElapsed() public view returns (uint) {
+		return (now-firstRevealTime);
 	}
 	function getState() public view returns (int) {
 	  	if(hash1==bytes32(0) && hash2==bytes32(0))

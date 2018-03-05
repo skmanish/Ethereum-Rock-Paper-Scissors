@@ -112,12 +112,12 @@ App = {
       if(state>=3){
           document.getElementById("state").innerHTML = "Both users locked";
           var choices=["","rock","paper","scissors"];
-          var claimed1 = state%10;
-          var claimed2 = Math.floor(state/10)%10;
+          var claimed2 = state%10;
+          var claimed1 = Math.floor(state/10)%10;
           if(claimed1!=0)
-            document.getElementById("state").innerHTML += " User 1 claimed "+choices[claimed1];
+            document.getElementById("state").innerHTML += ((claimed1==4)?" User1 Timed out":" User 1 claimed "+choices[claimed1]);
           if(claimed2!=0)
-            document.getElementById("state").innerHTML += " User 2 claimed "+choices[claimed2];
+            document.getElementById("state").innerHTML += ((claimed2==4)?" User2 Timed out":" User 2 claimed "+choices[claimed2]);
         }
         if(callback)
           callback(state);
@@ -189,17 +189,17 @@ App = {
       callback(registered);
     });
   },
-  // getContractBalance: function(callback){
-  //   var rpsInstance;
-  //   App.contracts.RPS.deployed().then(function(instance) {
-  //     rpsInstance = instance;
-  //     return rpsInstance.getContractBalance.call();
-  //   }).then(function(result){
-  //     console.log("Get contract balance result = "+result);
-  //   }).catch(function(err) {
-  //     console.log(err.message);
-  //   });
-  // },
+  getTime: function(callback){
+    var rpsInstance;
+    App.contracts.RPS.deployed().then(function(instance) {
+      rpsInstance = instance;
+      return rpsInstance.getTimeElapsed.call();
+    }).then(function(result){
+      console.log("Get time elapsed result = "+result);
+    }).catch(function(err) {
+      console.log(err.message);
+    });
+  },
   // getContractAddress: function(callback){
   //   var rpsInstance;
   //   App.contracts.RPS.deployed().then(function(instance) {
@@ -220,7 +220,7 @@ App = {
       var account = accounts[0];
       App.contracts.RPS.deployed().then(function(instance) {
         rpsInstance = instance;
-        return rpsInstance.processRewards({from: account, gasLimit: "100000"});
+        return rpsInstance.processRewards({from: account, gas: "100000"});
       }).then(function(result){
         console.log("Successfully collectRewards");
       }).catch(function(err) {
@@ -278,9 +278,10 @@ $(function() {
         // App.getGameState();
         // App.getUser(1);
         // App.getUser(2);
-        updateUserState();
         App.getUser(1);
         App.getUser(2);
+        App.getTime();
+        updateUserState();
       }, 2000);
   });
 
