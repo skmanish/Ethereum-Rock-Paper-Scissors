@@ -42,18 +42,6 @@ contract RPS {
 	}
 
 
-	//function () public payable {} 
-
-	// Initializes all the variables to default values
-	function cleanup() public {
-	  user1 = address(0);
-	  user2 = address(0);
-	  hash1 = bytes32(0);
-	  hash2 = bytes32(0);
-	  claimed1 = 0;
-	  claimed2 = 0;
-	  firstRevealTime = 0;
-	}
 	function register() public payable isNotRegistered checkbalance{
 		if(user1==0){
 			user1 = msg.sender;
@@ -144,31 +132,23 @@ contract RPS {
 		claimed2 = 0;
 		firstRevealTime = 0;
 	}
-	// Functions for logs
-	function getContractBalance() public constant returns (uint amount) {
-		return this.balance;
-	}
-	function getContractAddress() public constant returns (address) {
-		return this;
-	}
-	function sendAllMoney() public  {
-		msg.sender.transfer(this.balance);
-	}
+	// Function to get user 1
 	function getUser1() public view returns (address) {
 	  	return user1;
 	}
+	// Function to get user 2
 	function getUser2() public view returns (address) {
 	  	return user2;
 	}
-	function getHash1() public view returns (bytes32) {
-	  	return hash1;
-	}
-	function getHash2() public view returns (bytes32) {
-	  	return hash2;
-	}
-	function getTimeElapsed() public view returns (uint) {
-		return (now-firstRevealTime);
-	}
+	// Function to get state of game
+	/* States : 			0  	Users have not locked yet
+							1  	User 2 has locked, user 1 hasn't
+							2  	User 1 has locked, user 2 hasn't
+							421	Both users have locked, user1 claimed 'paper', user2 claimed 'rock'
+							413	Both users have locked, user1 claimed 'rock', user2 claimed 'scissors'
+							402 Both users have locked, user1 hasn't claimed anything yet, user2 claimed 'scissors'
+							441 Both users have locked, user1 coulnd't claim (timed-out), user2 claimed 'rock'
+	*/
 	function getState() public view returns (int) {
 	  	if(hash1==bytes32(0) && hash2==bytes32(0))
 	  		return 0;
@@ -186,17 +166,6 @@ contract RPS {
 	  		if(claimed2 == 0)
 	  			ans = 400 + (claimed1*10 + 4);
 	  	}
-	  	
-	  	// If one user has already opened a choice, while the other hasn't, then update a stale choice for the other
-	  	// if(firstRevealTime!=0 && (now-firstRevealTime)>=120){
-	  	// 	if(claimed1==0)
-	  	// 		claimed1 = -1;
-	  	// 	if(claimed2==0)
-	  	// 		claimed2 = -1;
-	  	// }
-	  	// If both users have opened their choices, and there is winner, process it
-	  	// if(claimed1!=0 && claimed2!=0)
-	  	// 	processRewards();
 
 	  	return ans;
 	}

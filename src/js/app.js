@@ -29,34 +29,9 @@ App = {
       // Set the provider for our contract
       App.contracts.RPS.setProvider(App.web3Provider);
 
-      // Use our contract to retrieve and mark the adopted pets
-      //return App.resetContract();
     });
 
-    return App.bindEvents();
-  },
-
-  resetContract: function(){
-    var rpsInstance;
-    // Cleanup requires spending some transaction, because it writes a value
-    web3.eth.getAccounts(function(error, accounts) {
-      if (error) {
-        console.log(error);
-      }
-      var account = accounts[0];
-      App.contracts.RPS.deployed().then(function(instance) {
-        rpsInstance = instance;
-        return rpsInstance.cleanup({from: account});
-      }).then(function(){
-        console.log("Successfully reset the contract to begin state");
-      }).catch(function(err) {
-        console.log(err.message);
-      });
-    });
-  },
-
-  bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
+    return;
   },
 
   getUser : function(id){
@@ -189,28 +164,6 @@ App = {
       callback(registered);
     });
   },
-  getTime: function(callback){
-    var rpsInstance;
-    App.contracts.RPS.deployed().then(function(instance) {
-      rpsInstance = instance;
-      return rpsInstance.getTimeElapsed.call();
-    }).then(function(result){
-      console.log("Get time elapsed result = "+result);
-    }).catch(function(err) {
-      console.log(err.message);
-    });
-  },
-  // getContractAddress: function(callback){
-  //   var rpsInstance;
-  //   App.contracts.RPS.deployed().then(function(instance) {
-  //     rpsInstance = instance;
-  //     return rpsInstance.getContractAddress.call();
-  //   }).then(function(result){
-  //     console.log("Get contract address result = "+result);
-  //   }).catch(function(err) {
-  //     console.log(err.message);
-  //   });
-  // },
   collectRewards: function(callback){
     var rpsInstance;
     web3.eth.getAccounts(function(error, accounts) {
@@ -229,6 +182,8 @@ App = {
     });
   }
 };
+
+// This function is called at regular intervals, it checks game state and updates the UI accordingly
 function updateUserState(){
   App.amIRegistered(function(registered){
     App.getGameState(function(state){
@@ -275,12 +230,8 @@ $(function() {
   $(window).load(function() {
     App.init();
      setInterval(function(){ 
-        // App.getGameState();
-        // App.getUser(1);
-        // App.getUser(2);
         App.getUser(1);
         App.getUser(2);
-        App.getTime();
         updateUserState();
       }, 2000);
   });
